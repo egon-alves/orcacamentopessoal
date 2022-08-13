@@ -1,0 +1,11 @@
+{
+    "editor.fontFamily":"'Source Code Pro', monospace;",
+    "editor.fontLigatures": false,
+    "editor.cursorBlinking": "solid",
+    "editor.cursorSmoothCaretAnimation": true,
+    "editor.cursorStyle": "line-thin",
+    "editor.cursorSurroundingLines": 1,
+    "editor.fontSize": 14,
+    "workbench.colorTheme": "Dracula Soft",
+    "workbench.sideBar.location": "left"
+}
