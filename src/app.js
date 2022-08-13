@@ -27,13 +27,16 @@ class bancoDados {
             localStorage.setItem('id', 0)
         }
     }
+
     getProximoId() {
         let proximoId = localStorage.getItem('id')
         return parseInt(proximoId) + 1
     }
     gravar(d) {
         let id = this.getProximoId()
+
         localStorage.setItem(id, JSON.stringify(d))
+
         localStorage.setItem('id', id)
     }
     recuperarTodosRegistros() {
@@ -42,10 +45,18 @@ class bancoDados {
         let id = localStorage.getItem('id')
         for (let i = 1; i <= id; i++) {
             let todasDespesas = JSON.parse(localStorage.getItem(i))
+
+            if (todasDespesas === null) {
+                continue
+            }
+            todasDespesas.id = i
             despesas.push(todasDespesas)
+
         }
+
         return despesas
     }
+
 
     pesquisar(despesas) {
         let despesasFiltradas = Array()
@@ -80,7 +91,11 @@ class bancoDados {
             console.log('Filtro descricao')
             despesasFiltradas = despesasFiltradas.filter(d => d.descricao == despesas.descricao)
         }
-        return  despesasFiltradas
+        return despesasFiltradas
+    }
+
+    remover(id) {
+        localStorage.removeItem(id)
     }
 }
 
@@ -139,13 +154,21 @@ function cadastrarDespesas() {
 
 // area JS consulta
 
-function carregaListaDespesas() {
-    let despesas = Array()
-    despesas = itemBancoDados.recuperarTodosRegistros()
+function carregaListaDespesas(despesas = Array(), filtro = false) {
+
+
+    if (despesas.length == 0 && filtro == false) {
+        despesas = itemBancoDados.recuperarTodosRegistros()
+    }
+
+
+
     let listaDespesas = document.getElementById('listaDespesasPage')
+    listaDespesas.innerHTML = ''
     despesas.forEach(function (d) {
 
         let linha = listaDespesas.insertRow()
+
         linha.insertCell(0).innerHTML = `${d.dia}/${d.mes}/${d.ano}`
         switch (d.tipo) {
             case '1': d.tipo = 'Alimentação'
@@ -160,8 +183,42 @@ function carregaListaDespesas() {
                 break
         }
         linha.insertCell(1).innerHTML = d.tipo
-        linha.insertCell(2).innerHTML = `${d.descricao}`
-        linha.insertCell(3).innerHTML = `R$ ${d.valor}`
+        linha.insertCell(2).innerHTML = d.descricao
+        linha.insertCell(3).innerHTML = d.valor
+
+        // isserir botao  
+        let btn = document.createElement('button')
+
+        btn.className = 'btn btn-danger'
+        btn.innerHTML = '<i class= "fas fa-times"></i>'
+        btn.id = 'idDespesa' + d.id
+
+
+        btn.onclick = function () {
+
+
+
+            let id = this.id.replace('idDespesa', '')
+
+
+
+
+            if (confirm("Deseja mesmo exluir?") == true) {
+                itemBancoDados.remover(id)
+
+                window.location.reload()
+            } else {
+
+                window.location.reload()
+            }
+
+
+
+            window.location.reload()
+
+        }
+        linha.insertCell(4).append(btn)
+        console.log(d);
     })
 }
 
@@ -176,33 +233,9 @@ function pesquisarDispesa() {
 
     let despesaPesquisar = new listDespesas(ano, mes, dia, tipo, descricao, valor)
 
-    itemBancoDados.pesquisar(despesaPesquisar)
-
     let despesas = itemBancoDados.pesquisar(despesaPesquisar)
 
-    let listaDespesas = document.getElementById('listaDespesasPage')
-
-    listaDespesas.innerHTML = ''
+    this.carregaListaDespesas(despesas, true)
 
 
-    despesas.forEach(function (d) {
-
-        let linha = listaDespesas.insertRow()
-        linha.insertCell(0).innerHTML = `${d.dia}/${d.mes}/${d.ano}`
-        switch (d.tipo) {
-            case '1': d.tipo = 'Alimentação'
-                break
-            case '2': d.tipo = 'Educação'
-                break
-            case '3': d.tipo = 'Lazer'
-                break
-            case '4': d.tipo = 'Saúde'
-                break
-            case '5': d.tipo = 'Educação'
-                break
-        }
-        linha.insertCell(1).innerHTML = d.tipo
-        linha.insertCell(2).innerHTML = `${d.descricao}`
-        linha.insertCell(3).innerHTML = `R$ ${d.valor}`
-    })
 }
